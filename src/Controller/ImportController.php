@@ -11,16 +11,8 @@ use App\Form\ExcelType;
 
 class ImportController extends AbstractController
 {
-    #[Route('/import', name: 'app_import')]
-    public function index(): Response
-    {
-        return $this->render('import/index.html.twig', [
-            'controller_name' => 'ImportController',
-        ]);
-    }
-
-    #[Route('/upload', name: 'app_upload')]
-    public function uploadAction(Request $request, FileUploader $file_uploader)
+    #[Route('/', name: 'app_import')]
+    public function index(Request $request): Response
     {
         $form = $this->createForm(ExcelType::class);
         $form->handleRequest($request);
