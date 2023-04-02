@@ -10,7 +10,7 @@
 {% block body %}
     <h1>Import de fichier personnalisé <span>avec jQuery et CSS</span></h1>
 
-    <div class="custom-file-upload">
+    <div id="formulaire" class="custom-file-upload">
         <div class="row">
         <div class="col-lg-8">
         {{ form_start(form, { attr: { 'accept-charset' : 'utf-8' }}) }}
@@ -28,6 +28,10 @@
         </div>
         </div>
     </div>
+
+    <div id="chargement" style="display:none;">
+        <img src="{{asset('img/loader.gif')}}">
+    </div>
 {% endblock %}
 
 {% block javascripts %}
@@ -37,9 +41,22 @@
         $(document).ready(function() {
             $('form[name="excel"]').submit(function(event) {
                 event.preventDefault(); // annuler l'action par défaut
-                
-            });
-        });
+                $('#chargement').show(); // afficher l'animation de chargement
+                $('#formulaire').hide();
+                // Envoi des données du formulaire en utilisant AJAX
+                $.ajax({
+                    url: "{{path('app_import')}}",
+                    type: 'POST',
+                    data: new FormData(this),
+                    contentType: false,
+                    processData: false,
+                    success: function(data) {
+                        $('#chargement').hide(); // masquer l'animation de chargement
+                        $('#formulaire').show();
+                    }
+                });//fin ajax
+            });//fin submit
+        });//fin doc ready
     </script>
 {% endblock %}
 
