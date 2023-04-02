@@ -21,6 +21,7 @@ class ImportController extends AbstractController
             $file = $form['upload_file']->getData();
             if ($file) 
             {
+                $file_uploader = new FileUploader();
                 $file_name = $file_uploader->upload($file);
                 if (null !== $file_name) // for example
                 {
