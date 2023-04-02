@@ -26,12 +26,11 @@ class ImportController extends AbstractController
             if ($file) 
             {
                 $file_name = $file_uploader->upload($file);
-                if (null !== $file_name) // for example
+                if (null !== $file_name) //le fichier a bien été importé
                 {
                     $directory = $file_uploader->getTargetDirectory();
                     $full_path = $directory.'/'.$file_name;
-                    // Do what you want with the full path file...
-                    // Why not read the content or parse it !!!
+                    //lecture du fichier pour insertion en base
                     if ($this->insertionEnBase($full_path,$clientRepository,$file_uploader))
                     {
                         $this->addFlash('success', 'Importation effectué !');
@@ -39,7 +38,8 @@ class ImportController extends AbstractController
                 }
                 else
                 {
-                    // Oups, an error occured !!!
+                    //erreur lors de l'import de fichier
+                    $this->addFlash('error', 'Une erreur est survenue !');
                 }
             }
         }
@@ -51,18 +51,16 @@ class ImportController extends AbstractController
     private function insertionEnBase(string $full_path, $clientRepository,$file_uploader) : bool
     {
         $reader = new Xlsx();
-        // Tell the reader to only read the data. Ignore formatting etc.
+        //on va juste lire le fichier importé
         $reader->setReadDataOnly(true);
-
-        // Read the spreadsheet file.
         $spreadsheet = $reader->load($full_path);
-
+        //on se positionne sur le premier onglet
         $sheet = $spreadsheet->getSheet($spreadsheet->getFirstSheetIndex());
         //améliorer la preformance dans une 2e version en lisant ligne par ligne le fichier
+        //la taille max est fixé à 1Mo ça passera
         $data = $sheet->toArray();
 
         //traitement des données du fichier excel
-        //verification du format sinon erreur
         $row = 0; 
         foreach ($data as $valeur)
         {

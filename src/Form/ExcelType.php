@@ -16,16 +16,11 @@ class ExcelType extends AbstractType
         $builder
         ->add('fichier', FileType::class, [
             'label' => 'Import des comptes (fichier excel)',
-            // unmapped means that this field is not associated to any entity property
-            'mapped' => false,
-            // make it optional so you don't have to re-upload the PDF file
-            // every time you edit the Product details
-            'required' => true,
-            // unmapped fields can't define their validation using annotations
-            // in the associated entity, so you can use the PHP constraint classes
+            'mapped' => false,//n'est pas associé à une entité; il s'agit d'un import simple
+            'required' => true,//il faut téléverser un fichier avant de soumettre le formulaire
             'constraints' => [
                 new File([
-                    'maxSize' => '1024k',
+                    'maxSize' => '1024k',//taille fichier max 1Mo 
                     'mimeTypes' => [
                         'application/vnd.ms-excel',
                         'application/excel', 

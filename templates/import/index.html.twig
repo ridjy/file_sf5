@@ -20,6 +20,11 @@
                 <div class="text-warning">
                     {{ form_errors(form.fichier) }}
                 </div>
+                {% for message in app.flashes('error') %}
+                    <div class="col-md-5 alert alert-warning">
+                        {{ message }}
+                    </div>
+                {% endfor %}
                 {% for message in app.flashes('success') %}
                     <div class="col-md-5 alert alert-success">
                         {{ message }}

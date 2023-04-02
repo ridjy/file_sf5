@@ -7,7 +7,8 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class FileUploader
 {
-    private $targetDirectory;
+    //définit dans service.yaml
+    private $targetDirectory;//chemin où le fichier uploadé sera stocké 
     private $slugger;
     public function __construct($targetDirectory, SluggerInterface $slugger)
     {
@@ -22,8 +23,8 @@ class FileUploader
         try {
             $file->move($this->getTargetDirectory(), $fileName);
         } catch (FileException $e) {
-            // ... handle exception if something happens during file upload
-            return null; // for example
+            //si il y a une erreur; par exemple un droit écriture non autorisé vers le dossier de destination
+            return null;
         }
         return $fileName;
     }
