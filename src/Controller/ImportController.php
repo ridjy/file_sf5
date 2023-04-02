@@ -28,11 +28,14 @@ class ImportController extends AbstractController
                 $file_name = $file_uploader->upload($file);
                 if (null !== $file_name) // for example
                 {
-                $directory = $file_uploader->getTargetDirectory();
-                $full_path = $directory.'/'.$file_name;
-                // Do what you want with the full path file...
-                // Why not read the content or parse it !!!
-                $this->insertionEnBase($full_path,$clientRepository,$file_uploader);
+                    $directory = $file_uploader->getTargetDirectory();
+                    $full_path = $directory.'/'.$file_name;
+                    // Do what you want with the full path file...
+                    // Why not read the content or parse it !!!
+                    if ($this->insertionEnBase($full_path,$clientRepository,$file_uploader))
+                    {
+                        $this->addFlash('success', 'Importation effectué !');
+                    }
                 }
                 else
                 {

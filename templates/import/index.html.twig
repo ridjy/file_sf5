@@ -15,48 +15,31 @@
         <div class="col-lg-8">
         {{ form_start(form, { attr: { 'accept-charset' : 'utf-8' }}) }}
             <div class="form-group">
-            {{ form_label(form.fichier) }}
-            {{ form_widget(form.fichier) }}
-            {{ form_errors(form.fichier) }}
+                {{ form_label(form.fichier) }}
+                {{ form_widget(form.fichier) }}
+                <div class="text-warning">
+                    {{ form_errors(form.fichier) }}
+                </div>
+                {% for message in app.flashes('success') %}
+                    <div class="col-md-5 alert alert-success">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                <!--<div class="text-success">
+                    
+                </div>-->
             </div>
-            <br/>
             <div class="form-group">
-            {{ form_widget(form.send, {'label': "Uploader", 'attr' : { 'class': 'btn btn-primary' }}) }}
+            {{ form_widget(form.send, {'label': "Téléverser le fichier", 'attr' : { 'class': 'btn btn-primary' }}) }}
             </div>
             {{ form_rest(form) }}
         {{ form_end(form) }}
         </div>
         </div>
     </div>
-
-    <div id="chargement" style="display:none;">
-        <img src="{{asset('img/loader.gif')}}">
-    </div>
 {% endblock %}
 
 {% block javascripts %}
-    <!-- JQuery -->
-    <script type="text/javascript" src="{{asset('js/jquery-3.6.4.min.js')}}"></script>
-    <script>
-        $(document).ready(function() {
-            $('form[name="excel"]').submit(function(event) {
-                event.preventDefault(); // annuler l'action par défaut
-                $('#chargement').show(); // afficher l'animation de chargement
-                $('#formulaire').hide();
-                // Envoi des données du formulaire en utilisant AJAX
-                $.ajax({
-                    url: "{{path('app_import')}}",
-                    type: 'POST',
-                    data: new FormData(this),
-                    contentType: false,
-                    processData: false,
-                    success: function(data) {
-                        $('#chargement').hide(); // masquer l'animation de chargement
-                        $('#formulaire').show();
-                    }
-                });//fin ajax
-            });//fin submit
-        });//fin doc ready
-    </script>
+    
 {% endblock %}
 
