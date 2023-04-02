@@ -116,7 +116,7 @@ class ImportController extends AbstractController
                 unset($o_client);
                 $row++;
             }
-        } catch(Throwable $t)//error et exception
+        } catch(\Throwable $t)//error et exception
         {
             //si il y a erreur 
             return false;

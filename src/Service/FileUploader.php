@@ -36,7 +36,7 @@ class FileUploader
 
     public function formattageDate($date)
     {
-        if ($date=='' || is_null($date))
+        if ($date=='' || is_null($date) || !is_float($date) || !is_int($date))
         {
             return null;
         } else {
@@ -45,6 +45,5 @@ class FileUploader
             $datetime->setTimestamp($timestamp);
             return $datetime; // affiche la date formatée
         }
-        //return $dateObj;
     }//fin formattagedate
 }
