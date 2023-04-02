@@ -27,9 +27,7 @@ class ExcelType extends AbstractType
                 new File([
                     'maxSize' => '1024k',
                     'mimeTypes' => [
-                        'application/vnd.ms-excel', 
-                        'application/x-csv', 
-                        'application/csv', 
+                        'application/vnd.ms-excel',
                         'application/excel', 
                         'application/vnd.msexcel', 
                         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
