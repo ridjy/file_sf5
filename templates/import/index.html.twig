@@ -3,11 +3,12 @@
 {% block title %}Import de fichier{% endblock %}
 
 {% block stylesheets %}
+    {{ parent() }}
     <link href="{{asset('css/global.css')}} " rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block body %}
-    <h1>Custom File Upload <span>With jQuery and CSS</span></h1>
+    <h1>Import de fichier personnalisé <span>avec jQuery et CSS</span></h1>
 
     <div class="custom-file-upload">
         <div class="row">
@@ -18,14 +19,27 @@
             {{ form_widget(form.fichier) }}
             {{ form_errors(form.fichier) }}
             </div>
+            <br/>
             <div class="form-group">
-            {{ form_widget(form.send, {'label': "Upload this file", 'attr' : { 'class': 'btn btn-primary' }}) }}
+            {{ form_widget(form.send, {'label': "Uploader", 'attr' : { 'class': 'btn btn-primary' }}) }}
             </div>
             {{ form_rest(form) }}
         {{ form_end(form) }}
         </div>
         </div>
     </div>
-
-
 {% endblock %}
+
+{% block javascripts %}
+    <!-- JQuery -->
+    <script type="text/javascript" src="{{asset('js/jquery-3.6.4.min.js')}}"></script>
+    <script>
+        $(document).ready(function() {
+            $('form[name="excel"]').submit(function(event) {
+                event.preventDefault(); // annuler l'action par défaut
+                
+            });
+        });
+    </script>
+{% endblock %}
+
