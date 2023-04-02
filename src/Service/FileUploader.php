@@ -27,8 +27,23 @@ class FileUploader
         }
         return $fileName;
     }
+
     public function getTargetDirectory()
     {
         return $this->targetDirectory;
     }
+
+    public function formattageDate($date)
+    {
+        if ($date=='' || is_null($date))
+        {
+            return null;
+        } else {
+            $timestamp = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToTimestamp($date);
+            $datetime = new \DateTime();
+            $datetime->setTimestamp($timestamp);
+            return $datetime; // affiche la date formatée
+        }
+        //return $dateObj;
+    }//fin formattagedate
 }

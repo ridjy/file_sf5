@@ -32,7 +32,7 @@ class ImportController extends AbstractController
                 $full_path = $directory.'/'.$file_name;
                 // Do what you want with the full path file...
                 // Why not read the content or parse it !!!
-                $this->insertionEnBase($full_path,$clientRepository);
+                $this->insertionEnBase($full_path,$clientRepository,$file_uploader);
                 }
                 else
                 {
@@ -45,7 +45,7 @@ class ImportController extends AbstractController
         ]);
     }//fin index
 
-    private function insertionEnBase(string $full_path, $clientRepository) : bool
+    private function insertionEnBase(string $full_path, $clientRepository,$file_uploader) : bool
     {
         $reader = new Xlsx();
         // Tell the reader to only read the data. Ignore formatting etc.
@@ -81,9 +81,9 @@ class ImportController extends AbstractController
             $o_client->setTelephonePortable($valeur[13]);
             $o_client->setTelephoneJob($valeur[14]);
             $o_client->setEmail($valeur[15]);
-            $o_client->setDateMiseEnCirculation(\DateTime::createFromFormat('d/m/Y', $valeur[16]));//false si vide
-            $o_client->setDateAchat(\DateTime::createFromFormat('d/m/Y', $valeur[17]));
-            $o_client->setDateDerniereEvenement(\DateTime::createFromFormat('d/m/Y', $valeur[18]));
+            $o_client->setDateMiseEnCirculation($file_uploader->formattageDate($valeur[16]));//false si vide
+            $o_client->setDateAchat($file_uploader->formattageDate($valeur[17]));
+            $o_client->setDateDerniereEvenement($file_uploader->formattageDate($valeur[18]));
             $o_client->setLibelleMarque($valeur[19]);
             $o_client->setLibelleModele($valeur[20]);
             $o_client->setVersion($valeur[21]);
@@ -98,7 +98,7 @@ class ImportController extends AbstractController
             $o_client->setTypeVNVO($valeur[30]);
             $o_client->setNumDossierVNVO($valeur[31]);
             $o_client->setIntermediaireVenteVN($valeur[32]);
-            $o_client->setDateEvenement(\DateTime::createFromFormat('d/m/Y', $valeur[33]));
+            $o_client->setDateEvenement($file_uploader->formattageDate($valeur[33]));
             $o_client->setOrigineEvenement($valeur[34]);
             $clientRepository->save($o_client,true);//on flush directement
             unset($o_client);
@@ -107,12 +107,5 @@ class ImportController extends AbstractController
         return true;
     }//fin insertion
 
-    #[Route('/testcode', name: 'app_testcode')]
-    public function test()
-    {
-        $dateStr = '';
-        $dateObj = \DateTime::createFromFormat('d/m/Y', $dateStr);
-        dd($dateObj);
-    }
 
 }
