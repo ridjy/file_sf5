@@ -10,17 +10,13 @@ use App\Service\FileUploader;
 use App\Form\ExcelType;
 use \PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use App\Entity\ClientsAPV;
+use App\Repository\ClientsAPVRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 class ImportController extends AbstractController
 {
-    private $em;
-    public function __construct()
-    {
-        $this->em = $this->getDoctrine()->getManager();
-    }
-
     #[Route('/', name: 'app_import')]
-    public function index(Request $request, FileUploader $file_uploader): Response
+    public function index(Request $request, FileUploader $file_uploader, ClientsAPVRepository $clientRepository): Response
     {
         $form = $this->createForm(ExcelType::class);
         $form->handleRequest($request);
@@ -36,7 +32,7 @@ class ImportController extends AbstractController
                 $full_path = $directory.'/'.$file_name;
                 // Do what you want with the full path file...
                 // Why not read the content or parse it !!!
-                $this->insertionEnBase($full_path);
+                $this->insertionEnBase($full_path,$clientRepository);
                 }
                 else
                 {
@@ -49,7 +45,7 @@ class ImportController extends AbstractController
         ]);
     }//fin index
 
-    private function insertionEnBase(string $full_path) : boolval
+    private function insertionEnBase(string $full_path, $clientRepository) : bool
     {
         $reader = new Xlsx();
         // Tell the reader to only read the data. Ignore formatting etc.
@@ -67,47 +63,56 @@ class ImportController extends AbstractController
         $row = 0; 
         foreach ($data as $valeur)
         {
-            if ($row==0) { continue; }//1ère ligne entête
-            $client = new ClientsAPV();
-            $client->setCompteAffaire($valeur[0]);
-            $client->setCompteEvenement($valeur[1]);
-            $client->setCompteDerniereEvenement($valeur[2]);
-            $client->setNumeroFiche($valeur[3]);
-            $client->setLibelleCivilite($valeur[4]);
-            $client->setProprietaireActuelVehicule($valeur[5]);
-            $client->setNom($valeur[6]);
-            $client->setPrenom($valeur[7]);
-            $client->setNumEtNomVoie($valeur[8]);
-            $client->setComplementAdresse1($valeur[9]);
-            $client->setCodePostal($valeur[10]);
-            $client->setVille($valeur[11]);
-            $client->setTelephoneDomicile($valeur[12]);
-            $client->setTelephonePortable($valeur[13]);
-            $client->setTelephoneJob($valeur[14]);
-            $client->setEmail($valeur[15]);
-            $client->setDateMiseEnCirculation($valeur[16]);
-            $client->setDateAchat($valeur[17]);
-            $client->setDateDerniereEvenement($valeur[18]);
-            $client->setLibelleMarque($valeur[19]);
-            $client->setLibelleModele($valeur[20]);
-            $client->setVersion($valeur[21]);
-            $client->setVIN($valeur[22]);
-            $client->setImmatriculation($valeur[23]);
-            $client->setTypeProspect($valeur[24]);
-            $client->setKilométrage($valeur[25]);
-            $client->setLibelleEnergie($valeur[26]);
-            $client->setVendeurVN($valeur[27]);
-            $client->setVendeurVO($valeur[28]);
-            $client->setCommentaireFacturation($valeur[29]);
-            $client->setTypeVNVO($valeur[30]);
-            $client->setNumDossierVNVO($valeur[31]);
-            $client->setIntermediaireVenteVN($valeur[32]);
-            $client->setDateEvenement($valeur[33]);
-            $client->setOrigineEvenement($valeur[34]);
-            $this->em->persist($client);
-            $this->em->flush($client);
-            unset($client);
+            if ($row==0) { $row++;continue; }//1ère ligne entête
+            $o_client = new ClientsAPV();
+            $o_client->setCompteAffaire($valeur[0]);
+            $o_client->setCompteEvenement($valeur[1]);
+            $o_client->setCompteDerniereEvenement($valeur[2]);
+            $o_client->setNumeroFiche($valeur[3]);
+            $o_client->setLibelleCivilite($valeur[4]);
+            $o_client->setProprietaireActuelVehicule($valeur[5]);
+            $o_client->setNom($valeur[6]);
+            $o_client->setPrenom($valeur[7]);
+            $o_client->setNumEtNomVoie($valeur[8]);
+            $o_client->setComplementAdresse1($valeur[9]);
+            $o_client->setCodePostal($valeur[10]);
+            $o_client->setVille($valeur[11]);
+            $o_client->setTelephoneDomicile($valeur[12]);
+            $o_client->setTelephonePortable($valeur[13]);
+            $o_client->setTelephoneJob($valeur[14]);
+            $o_client->setEmail($valeur[15]);
+            $o_client->setDateMiseEnCirculation(\DateTime::createFromFormat('d/m/Y', $valeur[16]));//false si vide
+            $o_client->setDateAchat(\DateTime::createFromFormat('d/m/Y', $valeur[17]));
+            $o_client->setDateDerniereEvenement(\DateTime::createFromFormat('d/m/Y', $valeur[18]));
+            $o_client->setLibelleMarque($valeur[19]);
+            $o_client->setLibelleModele($valeur[20]);
+            $o_client->setVersion($valeur[21]);
+            $o_client->setVIN($valeur[22]);
+            $o_client->setImmatriculation($valeur[23]);
+            $o_client->setTypeProspect($valeur[24]);
+            $o_client->setKilométrage($valeur[25]);
+            $o_client->setLibelleEnergie($valeur[26]);
+            $o_client->setVendeurVN($valeur[27]);
+            $o_client->setVendeurVO($valeur[28]);
+            $o_client->setCommentaireFacturation($valeur[29]);
+            $o_client->setTypeVNVO($valeur[30]);
+            $o_client->setNumDossierVNVO($valeur[31]);
+            $o_client->setIntermediaireVenteVN($valeur[32]);
+            $o_client->setDateEvenement(\DateTime::createFromFormat('d/m/Y', $valeur[33]));
+            $o_client->setOrigineEvenement($valeur[34]);
+            $clientRepository->save($o_client,true);//on flush directement
+            unset($o_client);
+            $row++;
         }
+        return true;
+    }//fin insertion
+
+    #[Route('/testcode', name: 'app_testcode')]
+    public function test()
+    {
+        $dateStr = '';
+        $dateObj = \DateTime::createFromFormat('d/m/Y', $dateStr);
+        dd($dateObj);
     }
 
 }
