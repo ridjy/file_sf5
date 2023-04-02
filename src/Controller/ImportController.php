@@ -34,6 +34,8 @@ class ImportController extends AbstractController
                     if ($this->insertionEnBase($full_path,$clientRepository,$file_uploader))
                     {
                         $this->addFlash('success', 'Importation effectué !');
+                    } else {
+                        $this->addFlash('error', 'Une erreur est survenue lors de l\'enregistrement des données !');    
                     }
                 }
                 else
@@ -61,50 +63,64 @@ class ImportController extends AbstractController
         $data = $sheet->toArray();
 
         //traitement des données du fichier excel
-        $row = 0; 
-        foreach ($data as $valeur)
+        //test si format valide
+        try
         {
-            if ($row==0) { $row++;continue; }//1ère ligne entête
-            $o_client = new ClientsAPV();
-            $o_client->setCompteAffaire($valeur[0]);
-            $o_client->setCompteEvenement($valeur[1]);
-            $o_client->setCompteDerniereEvenement($valeur[2]);
-            $o_client->setNumeroFiche($valeur[3]);
-            $o_client->setLibelleCivilite($valeur[4]);
-            $o_client->setProprietaireActuelVehicule($valeur[5]);
-            $o_client->setNom($valeur[6]);
-            $o_client->setPrenom($valeur[7]);
-            $o_client->setNumEtNomVoie($valeur[8]);
-            $o_client->setComplementAdresse1($valeur[9]);
-            $o_client->setCodePostal($valeur[10]);
-            $o_client->setVille($valeur[11]);
-            $o_client->setTelephoneDomicile($valeur[12]);
-            $o_client->setTelephonePortable($valeur[13]);
-            $o_client->setTelephoneJob($valeur[14]);
-            $o_client->setEmail($valeur[15]);
-            $o_client->setDateMiseEnCirculation($file_uploader->formattageDate($valeur[16]));//false si vide
-            $o_client->setDateAchat($file_uploader->formattageDate($valeur[17]));
-            $o_client->setDateDerniereEvenement($file_uploader->formattageDate($valeur[18]));
-            $o_client->setLibelleMarque($valeur[19]);
-            $o_client->setLibelleModele($valeur[20]);
-            $o_client->setVersion($valeur[21]);
-            $o_client->setVIN($valeur[22]);
-            $o_client->setImmatriculation($valeur[23]);
-            $o_client->setTypeProspect($valeur[24]);
-            $o_client->setKilométrage($valeur[25]);
-            $o_client->setLibelleEnergie($valeur[26]);
-            $o_client->setVendeurVN($valeur[27]);
-            $o_client->setVendeurVO($valeur[28]);
-            $o_client->setCommentaireFacturation($valeur[29]);
-            $o_client->setTypeVNVO($valeur[30]);
-            $o_client->setNumDossierVNVO($valeur[31]);
-            $o_client->setIntermediaireVenteVN($valeur[32]);
-            $o_client->setDateEvenement($file_uploader->formattageDate($valeur[33]));
-            $o_client->setOrigineEvenement($valeur[34]);
-            $clientRepository->save($o_client,true);//on flush directement
-            unset($o_client);
-            $row++;
-        }
+            $row = 0; 
+            foreach ($data as $valeur)
+            {
+                if ($row==0) { $row++;continue; }//1ère ligne entête
+                $o_client = new ClientsAPV();
+                $o_client->setCompteAffaire($valeur[0]);
+                $o_client->setCompteEvenement($valeur[1]);
+                $o_client->setCompteDerniereEvenement($valeur[2]);
+                $o_client->setNumeroFiche($valeur[3]);
+                $o_client->setLibelleCivilite($valeur[4]);
+                $o_client->setProprietaireActuelVehicule($valeur[5]);
+                $o_client->setNom($valeur[6]);
+                $o_client->setPrenom($valeur[7]);
+                $o_client->setNumEtNomVoie($valeur[8]);
+                $o_client->setComplementAdresse1($valeur[9]);
+                $o_client->setCodePostal($valeur[10]);
+                $o_client->setVille($valeur[11]);
+                $o_client->setTelephoneDomicile($valeur[12]);
+                $o_client->setTelephonePortable($valeur[13]);
+                $o_client->setTelephoneJob($valeur[14]);
+                $o_client->setEmail($valeur[15]);
+                $o_client->setDateMiseEnCirculation($file_uploader->formattageDate($valeur[16]));//false si vide
+                $o_client->setDateAchat($file_uploader->formattageDate($valeur[17]));
+                $o_client->setDateDerniereEvenement($file_uploader->formattageDate($valeur[18]));
+                $o_client->setLibelleMarque($valeur[19]);
+                $o_client->setLibelleModele($valeur[20]);
+                $o_client->setVersion($valeur[21]);
+                $o_client->setVIN($valeur[22]);//considéré comme valeur unique
+                $o_client->setImmatriculation($valeur[23]);
+                $o_client->setTypeProspect($valeur[24]);
+                $o_client->setKilométrage($valeur[25]);
+                $o_client->setLibelleEnergie($valeur[26]);
+                $o_client->setVendeurVN($valeur[27]);
+                $o_client->setVendeurVO($valeur[28]);
+                $o_client->setCommentaireFacturation($valeur[29]);
+                $o_client->setTypeVNVO($valeur[30]);
+                $o_client->setNumDossierVNVO($valeur[31]);
+                $o_client->setIntermediaireVenteVN($valeur[32]);
+                $o_client->setDateEvenement($file_uploader->formattageDate($valeur[33]));
+                $o_client->setOrigineEvenement($valeur[34]);
+                
+                //test si donnée déjà importé pour éviter les doublons
+                //si vinyle null on insère pas
+                if ($valeur[22]!='' && is_null($clientRepository->testDoublon($valeur[22])) )
+                {
+                    $clientRepository->save($o_client,true);//on flush directement
+                }
+                unset($o_client);
+                $row++;
+            }
+        } catch(Throwable $t)//error et exception
+        {
+            //si il y a erreur 
+            return false;
+        }    
         return true;
     }//fin insertion
 
